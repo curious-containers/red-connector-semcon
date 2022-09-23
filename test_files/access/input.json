@@ -1,0 +1,7 @@
+{
+  "auth": {
+    "username": "testuser",
+    "password": "testpassword"
+  },
+  "url": "http://localhost:3000/api/data"
+}
