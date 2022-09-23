@@ -10,8 +10,8 @@ from red_connector_semcon.semcon.send_receive_file import SEND_FILE_DESCRIPTION,
 
 
 CLI_VERSION = '1'
-SCRIPT_NAME = 'red-connector-http'
-DESCRIPTION = 'RED Connector HTTP'
+SCRIPT_NAME = 'red-connector-semcon'
+DESCRIPTION = 'RED Connector Semcon'
 TITLE = 'modes'
 
 MODES = OrderedDict([

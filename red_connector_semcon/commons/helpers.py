@@ -38,22 +38,6 @@ def graceful_error(func):
     return wrapper
 
 
-def _get_working_executable(executables):
-    """
-    Returns the first executable that can be found in PATH.
-    :param executables: A list of strings defining executables to test
-    :return: A string defining an executable in executables
-    :raise Exception: If no executable was found in PATH
-    """
-    for executable in executables:
-        if which(executable):
-            return executable
-
-    raise Exception('One of the following executables must be present in PATH: {}'.format(
-        executables
-    ))
-
-
 def http_method_func(access, default):
     http_method = access.get('method', default).lower()
 
