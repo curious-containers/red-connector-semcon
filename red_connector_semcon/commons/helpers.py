@@ -42,7 +42,7 @@ def _get_working_executable(executables):
     """
     Returns the first executable that can be found in PATH.
     :param executables: A list of strings defining executables to test
-    :return: A string defining a executable in executables
+    :return: A string defining an executable in executables
     :raise Exception: If no executable was found in PATH
     """
     for executable in executables:
