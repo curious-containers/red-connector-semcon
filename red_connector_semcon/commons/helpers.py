@@ -1,8 +1,8 @@
+import json
 import os
 import sys
 import jsonschema
 from functools import wraps
-from shutil import which
 
 import requests
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
@@ -96,10 +96,18 @@ def fetch_file(file_path, url, http_method, auth_method, verify=True):
     )
     r.raise_for_status()
 
-    with open(file_path, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=4096):
-            if chunk:
-                f.write(chunk)
+    data = r.json().get('data')
+    if data is None:
+        raise InvalidDataException('No data key in response.')
+    if len(data) < 1:
+        raise InvalidDataException('Empty data object.')
+    data = data[-1]
+    content = data.get('content')
+    if content is None:
+        raise InvalidDataException('No content key in data.')
+
+    with open(file_path, 'w') as f:
+        json.dump(content, f)
 
     r.raise_for_status()
 
@@ -120,3 +128,7 @@ def build_path(base_path, listing, key):
         if sub['class'] == 'Directory':
             if 'listing' in sub:
                 build_path(path, sub['listing'], key)
+
+
+class InvalidDataException(Exception):
+    pass
