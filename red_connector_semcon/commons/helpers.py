@@ -101,7 +101,7 @@ def fetch_file(file_path, url, http_method, auth_method, verify=True):
         raise InvalidDataException('No data key in response.')
     if len(data) < 1:
         raise InvalidDataException('Empty data object.')
-    data = data[-1]
+    data = data[-1]  # always take last entry
     content = data.get('content')
     if content is None:
         raise InvalidDataException('No content key in data.')
