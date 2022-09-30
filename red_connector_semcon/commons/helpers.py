@@ -102,9 +102,9 @@ def fetch_file(file_path, url, http_method, auth_method, verify=True):
     if len(data) < 1:
         raise InvalidDataException('Empty data object.')
     data = data[-1]  # always take last entry
-    content = data.get('content')
-    if content is None:
+    if 'content' not in data:
         raise InvalidDataException('No content key in data.')
+    content = data['content']
 
     with open(file_path, 'w') as f:
         json.dump(content, f)
