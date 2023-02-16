@@ -9,7 +9,7 @@ homepage = "https://www.curious-containers.cc/"
 description = "RED Connector Semcon is part of the Curious Containers project."
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 requests = "^2.28"
 jsonschema = "^3.0"
 
