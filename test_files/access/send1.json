@@ -4,5 +4,5 @@
     "password": "testpassword"
   },
   "url": "http://localhost:3000/api/data",
-  "key": "executable"
+  "key": "postkey"
 }
