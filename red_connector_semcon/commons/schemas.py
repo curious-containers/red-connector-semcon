@@ -22,8 +22,9 @@ SCHEMA = {
             'additionalProperties': False,
             'required': ['username', 'password']
         },
+        'key': {'type': 'string'},
         'disableSSLVerification': {'type': 'boolean'}
     },
     'additionalProperties': False,
-    'required': ['url']
+    'required': ['url', 'key']
 }

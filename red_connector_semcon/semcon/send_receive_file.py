@@ -20,12 +20,13 @@ def _receive_file(access, local_file_path):
 
     http_method = http_method_func(access, 'GET')
     auth_method = auth_method_obj(access)
+    data_key = access.get('key')
 
     verify = True
     if access.get('disableSSLVerification'):
         verify = False
 
-    fetch_file(local_file_path, access['url'], http_method, auth_method, verify)
+    fetch_file(local_file_path, access['url'], http_method, auth_method, verify, data_key)
 
 
 def _receive_file_validate(access):
@@ -41,6 +42,7 @@ def _send_file(access, local_file_path):
 
     http_method = http_method_func(access, 'POST')
     auth_method = auth_method_obj(access)
+    data_key = access.get('key')
 
     verify = True
     if access.get('disableSSLVerification'):
@@ -49,7 +51,7 @@ def _send_file(access, local_file_path):
     with open(local_file_path, 'rb') as f:
         r = http_method(
             access['url'],
-            data=f,
+            data={data_key: f.read()},
             auth=auth_method,
             verify=verify,
             timeout=DEFAULT_TIMEOUT

@@ -72,7 +72,7 @@ def auth_method_obj(access):
     raise Exception('Invalid auth method: {}'.format(auth_method))
 
 
-def fetch_file(file_path, url, http_method, auth_method, verify=True):
+def fetch_file(file_path, url, http_method, auth_method, verify=True, data_key=None):
     """
     Fetches the given file. Assumes that the directory in which this file is stored is already present in the local
     filesystem.
@@ -83,6 +83,7 @@ def fetch_file(file_path, url, http_method, auth_method, verify=True):
     if called with (url, auth=auth_method, verify=verify, stream=True)
     :param auth_method: An auth_method, which can be used as parameter for requests.http_method
     :param verify: A boolean indicating if SSL Certification should be used.
+    :param data_key: The key to index the json data. If None no key will be used.
 
     :raise requests.exceptions.HTTPError: If the HTTP requests could not be resolved correctly.
     """
@@ -104,10 +105,16 @@ def fetch_file(file_path, url, http_method, auth_method, verify=True):
     data = data[-1]  # always take last entry
     if 'content' not in data:
         raise InvalidDataException('No content key in data.')
-    content = data['content']
+    data = data['content']
+
+    if data_key is not None:
+        data = data[data_key]
 
     with open(file_path, 'w') as f:
-        json.dump(content, f)
+        if isinstance(data, str) and not file_path.endswith('.json'):  # dump strings as plain files. Not as json.
+            f.write(data)
+        else:
+            json.dump(data, f)
 
     r.raise_for_status()
 
