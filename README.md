@@ -7,7 +7,6 @@ This connector is designed to read data from a [semantic container](https://www.
 For more information please refer to the Curious Containers [documentation](https://www.curious-containers.cc/).
 
 ## Limitations / Future Work
-- No O-Auth authentification used by Semantic Container. This may be implemented in the future.
 - Only handles json data from Semantic Container. No other format or binary data is supported.
 
 ## Acknowledgements

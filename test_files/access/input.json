@@ -1,7 +1,8 @@
 {
   "auth": {
     "username": "testuser",
-    "password": "testpassword"
+    "password": "testpassword",
+    "scope": "read"
   },
   "url": "http://localhost:3000/api/data",
   "key": "executable"

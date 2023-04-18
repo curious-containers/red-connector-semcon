@@ -3,6 +3,7 @@ import os
 import sys
 import jsonschema
 from functools import wraps
+from urllib.parse import urljoin
 
 import requests
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
@@ -11,6 +12,9 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 CONNECT_TIMEOUT = 12.05
 READ_TIMEOUT = 1000
 DEFAULT_TIMEOUT = (CONNECT_TIMEOUT, READ_TIMEOUT)
+
+OAUTH_ENDPOINT = '/oauth/token'
+OAUTH_GRANTTYPE = 'client_credentials'
 
 
 class ListingError(Exception):
@@ -51,28 +55,47 @@ def http_method_func(access, default):
     raise Exception('Invalid HTTP method: {}'.format(http_method))
 
 
-def auth_method_obj(access):
+def oauth_token(access, verify, default_scope='read'):
     if not access.get('auth'):
         return None
-
+    
+    url = urljoin(access['url'], OAUTH_ENDPOINT)
     auth = access['auth']
-    auth_method = auth.get('method', 'basic').lower()
+    
+    client_id = auth['username']
+    client_secret = auth['password']
+    scope = auth.get('scope', default_scope)
+    
+    data = {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "grant_type": OAUTH_GRANTTYPE,
+        "scope": scope
+    }
+    
+    r = requests.post(
+        url,
+        json=data,
+        verify=verify,
+        stream=True,
+        timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
+    )
+    r.raise_for_status()
+    
+    access_token = r.json().get('access_token')
+    return access_token
 
-    if auth_method == 'basic':
-        return HTTPBasicAuth(
-            auth['username'],
-            auth['password']
-        )
-    if auth_method == 'digest':
-        return HTTPDigestAuth(
-            auth['username'],
-            auth['password']
-        )
-
-    raise Exception('Invalid auth method: {}'.format(auth_method))
+def bearer_auth_header(access_token):
+    if access_token is None:
+        return None
+    
+    headers = {
+        'Authorization': f"Bearer {access_token}"
+    }
+    return headers
 
 
-def fetch_file(file_path, url, http_method, auth_method, verify=True, data_key=None):
+def fetch_file(file_path, url, http_method, headers, verify=True, data_key=None):
     """
     Fetches the given file. Assumes that the directory in which this file is stored is already present in the local
     filesystem.
@@ -80,8 +103,8 @@ def fetch_file(file_path, url, http_method, auth_method, verify=True, data_key=N
     :param file_path: The path where the file content should be stored
     :param url: The url from where to fetch the file
     :param http_method: An function object, which returns a requests result,
-    if called with (url, auth=auth_method, verify=verify, stream=True)
-    :param auth_method: An auth_method, which can be used as parameter for requests.http_method
+    if called with (url, headers=headers, verify=verify, stream=True)
+    :param headers: The request headers, which will be send with the http request.
     :param verify: A boolean indicating if SSL Certification should be used.
     :param data_key: The key to index the json data. If None no key will be used.
 
@@ -90,7 +113,7 @@ def fetch_file(file_path, url, http_method, auth_method, verify=True, data_key=N
 
     r = http_method(
         url,
-        auth=auth_method,
+        headers=headers,
         verify=verify,
         stream=True,
         timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
