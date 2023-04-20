@@ -6,7 +6,6 @@ from functools import wraps
 from urllib.parse import urljoin
 
 import requests
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 
 CONNECT_TIMEOUT = 12.05
