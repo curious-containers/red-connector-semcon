@@ -4,9 +4,6 @@ from copy import deepcopy
 _HTTP_METHODS = ['Get', 'Put', 'Post']
 _HTTP_METHODS_ENUMS = deepcopy(_HTTP_METHODS) + [m.lower() for m in _HTTP_METHODS] + [m.upper() for m in _HTTP_METHODS]
 
-_AUTH_METHODS = ['Basic', 'Digest']
-_AUTH_METHODS_ENUMS = deepcopy(_AUTH_METHODS) + [m.lower() for m in _AUTH_METHODS] + [m.upper() for m in _AUTH_METHODS]
-
 SCHEMA = {
     'type': 'object',
     'properties': {
@@ -17,7 +14,7 @@ SCHEMA = {
             'properties': {
                 'username': {'type': 'string'},
                 'password': {'type': 'string'},
-                'method': {'enum': _AUTH_METHODS_ENUMS}
+                'scope': {'type': 'string'}
             },
             'additionalProperties': False,
             'required': ['username', 'password']

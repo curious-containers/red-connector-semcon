@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import jsonschema
 
 from red_connector_semcon.commons.schemas import SCHEMA
-from red_connector_semcon.commons.helpers import http_method_func, auth_method_obj, fetch_file, graceful_error,\
+from red_connector_semcon.commons.helpers import http_method_func, oauth_token, bearer_auth_header, fetch_file, graceful_error,\
     DEFAULT_TIMEOUT
 
 RECEIVE_FILE_DESCRIPTION = 'Receive input file from semantic container.'
@@ -18,15 +18,16 @@ def _receive_file(access, local_file_path):
     with open(access) as f:
         access = json.load(f)
 
-    http_method = http_method_func(access, 'GET')
-    auth_method = auth_method_obj(access)
-    data_key = access.get('key')
-
     verify = True
     if access.get('disableSSLVerification'):
         verify = False
 
-    fetch_file(local_file_path, access['url'], http_method, auth_method, verify, data_key)
+    http_method = http_method_func(access, 'GET')
+    access_token = oauth_token(access, verify)
+    headers = bearer_auth_header(access_token)
+    data_key = access.get('key')
+
+    fetch_file(local_file_path, access['url'], http_method, headers, verify, data_key)
 
 
 def _receive_file_validate(access):
@@ -40,19 +41,20 @@ def _send_file(access, local_file_path):
     with open(access) as f:
         access = json.load(f)
 
-    http_method = http_method_func(access, 'POST')
-    auth_method = auth_method_obj(access)
-    data_key = access.get('key')
-
     verify = True
     if access.get('disableSSLVerification'):
         verify = False
+
+    http_method = http_method_func(access, 'POST')
+    access_token = oauth_token(access, verify)
+    headers = bearer_auth_header(access_token)
+    data_key = access.get('key')
 
     with open(local_file_path, 'rb') as f:
         r = http_method(
             access['url'],
             data={data_key: f.read()},
-            auth=auth_method,
+            headers=headers,
             verify=verify,
             timeout=DEFAULT_TIMEOUT
         )
