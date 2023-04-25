@@ -4,6 +4,10 @@
     "password": "testpassword",
     "scope": "read"
   },
-  "url": "http://localhost:3000/api/data",
-  "key": "executable"
+  "resource": {
+    "resourceType": "id",
+    "resourceValue": "1",
+    "format": "plain"
+  },
+  "url": "http://localhost:3000/api/data"
 }
