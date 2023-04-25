@@ -94,7 +94,7 @@ def bearer_auth_header(access_token):
     return headers
 
 
-def fetch_file(file_path, url, http_method, headers, verify=True, data_key=None):
+def fetch_file(file_path, url, http_method, headers, params, verify=True, data_key=None):
     """
     Fetches the given file. Assumes that the directory in which this file is stored is already present in the local
     filesystem.
@@ -102,8 +102,9 @@ def fetch_file(file_path, url, http_method, headers, verify=True, data_key=None)
     :param file_path: The path where the file content should be stored
     :param url: The url from where to fetch the file
     :param http_method: An function object, which returns a requests result,
-    if called with (url, headers=headers, verify=verify, stream=True)
+    if called with (url, headers=headers, params=params, verify=verify, stream=True)
     :param headers: The request headers, which will be send with the http request.
+    :param params: The parameters, which will be send with the http request.
     :param verify: A boolean indicating if SSL Certification should be used.
     :param data_key: The key to index the json data. If None no key will be used.
 
@@ -113,24 +114,24 @@ def fetch_file(file_path, url, http_method, headers, verify=True, data_key=None)
     r = http_method(
         url,
         headers=headers,
+        params=params,
         verify=verify,
         stream=True,
         timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
     )
     r.raise_for_status()
-
-    data = r.json().get('data')
-    if data is None:
-        raise InvalidDataException('No data key in response.')
-    if len(data) < 1:
-        raise InvalidDataException('Empty data object.')
-    data = data[-1]  # always take last entry
-    if 'content' not in data:
-        raise InvalidDataException('No content key in data.')
-    data = data['content']
-
+    
+    data = r.json()
+    
     if data_key is not None:
-        data = data[data_key]
+        if 'data' in data:
+            data = data['data']
+        if 'content' in data:
+            data = data['content']
+        if isinstance(data, dict):
+            data = data[data_key]
+        else:
+            raise InvalidDataException('Cannot fetch data key from a list. To use the data key, select a specific resource with its id or dri!')
 
     with open(file_path, 'w') as f:
         if isinstance(data, str) and not file_path.endswith('.json'):  # dump strings as plain files. Not as json.
