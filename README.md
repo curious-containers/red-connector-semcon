@@ -7,7 +7,7 @@ This connector is designed to read data from a [semantic container](https://www.
 For more information please refer to the Curious Containers [documentation](https://www.curious-containers.cc/).
 
 ## Limitations / Future Work
-- Only handles json data from Semantic Container. No other format or binary data is supported.
+- Selections within the content of a data entry are partially supported in json format. For any other format this is currently not possible.
 
 ## Acknowledgements
 
