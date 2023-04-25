@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 import jsonschema
 
-from red_connector_semcon.commons.schemas import SCHEMA
+from red_connector_semcon.commons.schemas import RECEIVE_FILE_SCHEMA, SEND_FILE_SCHEMA
 from red_connector_semcon.commons.helpers import http_method_func, oauth_token, bearer_auth_header, fetch_file, graceful_error,\
     DEFAULT_TIMEOUT
 
@@ -32,21 +32,16 @@ def _receive_file(access, local_file_path):
     
     if access.get('resource'):
         resource = access['resource']
+        resource_type = resource['resourceType']
+        resource_value = resource['resourceValue']
         
-        if resource.get('key'):
-            data_key = resource['key']
-        
-        if resource.get('id'):
-            url = url.strip('/') + f"/{resource['id']}"
-            params['p'] = 'id'
-        elif resource.get('dri'):
-            url = url.strip('/') + f"/{resource['dri']}"
-            params['p'] = 'dri'
-        else:
-            if resource.get('schemaDri'):
-                params['schema_dri'] = resource['schemaDri']
-            if resource.get('tableName'):
-                params['table'] = resource['tableName']
+        if resource_type == 'id' or resource_type == 'dri':
+            url = url.strip('/') + f"/{resource_value}"
+            params['p'] = resource_type
+            if resource.get('key'):
+                data_key = resource['key']
+        else: # resource_type == schema_dri or table
+            params[resource_type] = resource_value
         
         params['f'] = resource.get('format', 'plain')
 
@@ -57,7 +52,7 @@ def _receive_file_validate(access):
     with open(access) as f:
         access = json.load(f)
 
-    jsonschema.validate(access, SCHEMA)
+    jsonschema.validate(access, RECEIVE_FILE_SCHEMA)
 
 
 def _send_file(access, local_file_path):
@@ -90,14 +85,19 @@ def _send_file(access, local_file_path):
     
     
     with open(local_file_path, 'rb') as f:
-        content = json.loads(f.read())
-        if data_key is None:
-            write_data['content'] = content
-        else:
-            write_data['content'] = {
-                data_key: content
-            }
-    print(write_data)
+        local_file_content = f.read()
+        local_file_content = local_file_content.decode()
+        
+    try:
+        content = json.loads(local_file_content)
+    except ValueError as e:
+        content = local_file_content
+    if data_key is None:
+        write_data['content'] = content
+    else:
+        write_data['content'] = {
+            data_key: content
+        }
     
     r = http_method(
         access['url'],
@@ -113,7 +113,7 @@ def _send_file_validate(access):
     with open(access) as f:
         access = json.load(f)
     
-    jsonschema.validate(access, SCHEMA)
+    jsonschema.validate(access, SEND_FILE_SCHEMA)
 
 
 @graceful_error
