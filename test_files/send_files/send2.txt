@@ -1,0 +1,6 @@
+{
+    "size": "32",
+    "eye_color": "green",
+    "hair": "long",
+    "name": "foo"
+}
