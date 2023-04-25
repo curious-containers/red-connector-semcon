@@ -131,7 +131,7 @@ def fetch_file(file_path, url, http_method, headers, params, verify=True, data_k
         if isinstance(data, dict):
             data = data[data_key]
         else:
-            raise InvalidDataException('Cannot fetch data key from a list. To use the data key, select a specific resource with its id or dri!')
+            raise InvalidDataException('Data key can only be fetched from a dictonary.')
 
     with open(file_path, 'w') as f:
         if isinstance(data, str) and not file_path.endswith('.json'):  # dump strings as plain files. Not as json.
