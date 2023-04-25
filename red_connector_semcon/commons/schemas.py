@@ -42,7 +42,7 @@ RECEIVE_FILE_SCHEMA['resource'] = {
 }
 
 SEND_FILE_SCHEMA = deepcopy(_BASE_SCHEMA)
-RECEIVE_FILE_SCHEMA['resource'] = {
+SEND_FILE_SCHEMA['resource'] = {
     'type': 'object',
     'properties': {
         'dri': {'type': 'string'},
