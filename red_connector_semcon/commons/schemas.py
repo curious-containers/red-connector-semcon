@@ -29,25 +29,25 @@ _BASE_SCHEMA = {
 }
 
 RECEIVE_FILE_SCHEMA = deepcopy(_BASE_SCHEMA)
-RECEIVE_FILE_SCHEMA['resource'] = {
+RECEIVE_FILE_SCHEMA['properties']['resource'] = {
     'type': 'object',
     'properties': {
-        'resource_type': {'enum': _RESOURCE_TYPE_ENUMS},
-        'resource_value': {'type': 'string'},
+        'resourceType': {'enum': _RESOURCE_TYPE_ENUMS},
+        'resourceValue': {'type': 'string'},
         'key': {'type': 'string'},
         'format': {'enum': _OUTPUT_FORMAT_ENUMS}
     },
     'additionalProperties': False,
-    'required': ['resource_type', 'resource_value']
+    'required': ['resourceType', 'resourceValue']
 }
 
 SEND_FILE_SCHEMA = deepcopy(_BASE_SCHEMA)
-SEND_FILE_SCHEMA['resource'] = {
+SEND_FILE_SCHEMA['properties']['resource'] = {
     'type': 'object',
     'properties': {
         'dri': {'type': 'string'},
-        'schema_dri': {'type': 'string'},
-        'table': {'type': 'string'},
+        'schemaDri': {'type': 'string'},
+        'tableName': {'type': 'string'},
         'key': {'type': 'string'}
     },
     'additionalProperties': False
