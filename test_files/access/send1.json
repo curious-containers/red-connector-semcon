@@ -4,6 +4,10 @@
     "password": "testpassword",
     "scope": "write"
   },
-  "url": "http://localhost:3000/api/data",
-  "key": "postkey"
+  "resource": {
+    "dri": "0",
+    "schemaDri": "bar",
+    "tableName": "default"
+  },
+  "url": "http://localhost:3000/api/data"
 }
